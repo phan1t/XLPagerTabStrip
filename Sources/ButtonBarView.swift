@@ -75,7 +75,7 @@ open class ButtonBarView: UICollectionView {
         updateSelectedBarPosition(animated, swipeDirection: swipeDirection, pagerScroll: pagerScroll)
     }
 
-    open func move(fromIndex: Int, toIndex: Int, progressPercentage: CGFloat, pagerScroll: PagerScroll) {
+    open func move(fromIndex: Int, toIndex: Int, progressPercentage: CGFloat, pagerScroll: PagerScroll, scrollToSelectedButton: Bool) {
         selectedIndex = progressPercentage > 0.5 ? toIndex : fromIndex
 
         let fromFrame = layoutAttributesForItem(at: IndexPath(item: fromIndex, section: 0))!.frame
@@ -101,7 +101,7 @@ open class ButtonBarView: UICollectionView {
         targetFrame.origin.x += (toFrame.origin.x - fromFrame.origin.x) * progressPercentage
 
         selectedBar.frame = CGRect(x: targetFrame.origin.x, y: selectedBar.frame.origin.y, width: targetFrame.size.width, height: selectedBar.frame.size.height)
-
+      
         var targetContentOffset: CGFloat = 0.0
         if contentSize.width > frame.size.width {
             let toContentOffset = contentOffsetForCell(withFrame: toFrame, andIndex: toIndex)
@@ -109,8 +109,11 @@ open class ButtonBarView: UICollectionView {
 
             targetContentOffset = fromContentOffset + ((toContentOffset - fromContentOffset) * progressPercentage)
         }
-
-        setContentOffset(CGPoint(x: targetContentOffset, y: 0), animated: false)
+        //MARK: Loop Bar Item
+        if scrollToSelectedButton {
+          setContentOffset(CGPoint(x: targetContentOffset, y: 0), animated: false)
+        }
+  
     }
 
     open func updateSelectedBarPosition(_ animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll) {
@@ -179,7 +182,7 @@ open class ButtonBarView: UICollectionView {
         case .bottom:
             selectedBarFrame.origin.y = frame.size.height - selectedBarHeight
         }
-
+      
         selectedBarFrame.size.height = selectedBarHeight
         selectedBar.frame = selectedBarFrame
     }
